@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: service-c
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: service-c
+
+  template:
+    metadata:
+      labels:
+        app: service-c
+
+    spec:
+      containers:
+
+      - name: service-c
+        image: python:3.10-slim
+
+        command: ["python","/app/service-c.py"]
+
+        ports:
+        - containerPort: 5000
