@@ -1,20 +1,30 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
- name: service-a
+  name: service-a
 spec:
- replicas: 1
- selector:
-   matchLabels:
-     app: service-a
- template:
-   metadata:
-     labels:
-       app: service-a
-   spec:
-     containers:
-     - name: service-a
-       image: python:3.10-slim
-       command: ["python","/app/service-a.py"]
-       ports:
-       - containerPort: 5000
+  replicas: 1
+  selector:
+    matchLabels:
+      app: service-a
+  template:
+    metadata:
+      labels:
+        app: service-a
+    spec:
+      containers:
+      - name: service-a
+        image: python:3.10-slim
+        command: ["sh", "-c"]
+        args:
+          - pip install flask requests && python /app/service-a.py
+        ports:
+        - containerPort: 5000
+        volumeMounts:
+        - name: script-volume
+          mountPath: /app/service-a.py
+          subPath: service-a.py
+      volumes:
+      - name: script-volume
+        configMap:
+          name: service-a-script

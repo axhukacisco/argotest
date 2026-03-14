@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: localstack
+  labels:
+    app: localstack
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: localstack
+  template:
+    metadata:
+      labels:
+        app: localstack
+    spec:
+      containers:
+        - name: localstack
+          image: localstack/localstack:latest
+          ports:
+            - containerPort: 4566   # Main LocalStack endpoint
+            - containerPort: 4571   # Lambda executor
+            - containerPort: 8080   # LocalStack Web UI
+          env:
+            # Enable AWS services
+            - name: SERVICES
+              value: "lambda,logs,s3,cloudwatch,ui"
+
+            # Enable debug mode (optional but helpful)
+            - name: DEBUG
+              value: "1"
+
+            # Use Docker executor for Lambda
+            - name: LAMBDA_EXECUTOR
+              value: "docker"
+
+            # Explicitly enable the Web UI
+            - name: LOCALSTACK_UI
+              value: "1"
+
+          # Required for Lambda Docker executor
+          volumeMounts:
+            - name: docker-sock
+              mountPath: /var/run/docker.sock
+
+      volumes:
+        - name: docker-sock
+          hostPath:
+            path: /var/run/docker.sock
